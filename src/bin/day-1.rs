@@ -1,8 +1,6 @@
 use std::cmp::Ordering;
-use std::fs;
 
-fn get_total_calories(path: &str) -> Vec<u32> {
-    let contents = fs::read_to_string(path).expect("Something went wrong reading the file");
+fn get_total_calories(contents: &str) -> Vec<u32> {
     let mut total_calories: Vec<u32> = Vec::new();
     let mut calories = 0;
     for line in contents.lines() {
@@ -29,11 +27,22 @@ fn find_max_calories(total_calories: &Vec<u32>) -> u32 {
 }
 
 fn main() {
-    let path = "src/bin/day-1-input.txt";
-    let mut total_calories = get_total_calories(path);
+    // Load the input file
+    let contents = include_str!("day-1-input.txt");
+
+    // Get the total calories for each elf
+    let mut total_calories = get_total_calories(&contents);
+
+    // Find the max calories
     println!("Elf with most calories: {}", find_max_calories(&total_calories));
+
+    // Sort the total calories
     total_calories.sort();
     total_calories.reverse();
+
+    // Find the max calories (again)
     println!("Elf with most calories: {}", total_calories[0]);
+
+    // Sum the first 3 elves
     println!("Top 3 elves: {}", total_calories[..3].iter().sum::<u32>());
 }
