@@ -55,5 +55,26 @@ fn main() -> Result<()> {
 
     println!("Sum of signal: {}", signal.iter().sum::<i32>());
 
+    println!("Part 2");
+
+    let mut crt = Vec::new();
+
+    for c in 0..240 {
+        let sprite = vec![register.x[c] - 1, register.x[c], register.x[c] + 1];
+        let mut pixel = '.';
+        let cycle = register.cycle[c] % 40;
+        if sprite.contains(&cycle) {
+            pixel = '#';
+        }
+        crt.push(pixel);
+    }
+
+    for i in 0..crt.len() {
+        if i % 40 == 0 {
+            println!();
+        }
+        print!("{}", crt[i]);
+    }
+
     return Ok(());
 }
