@@ -1,7 +1,5 @@
-use eval::{eval, Value};
-
 use anyhow::Result;
-use regex::Regex;
+use serde_json::Value;
 
 fn check_packet(left: &Value, right: &Value) -> Option<bool> {
     match (left, right) {
@@ -51,17 +49,12 @@ fn sort_packets(array: &mut Vec<Value>) {
 
 fn main() -> Result<()> {
     let input = std::fs::read_to_string("src/bin/day-13-input.txt")?;
-    let re = Regex::new(r"\[").unwrap();
-    let input = re.replace_all(&input, "array(");
-    let re = Regex::new(r"\]").unwrap();
-    let input = re.replace_all(&input, ")");
-
 
     println!("Part 1");
 
     let message = input
         .split("\n\n")
-        .map(|b| b.lines().collect::<Vec<_>>().iter().map(|v| eval(v).expect("issue with eval")).collect::<Vec<_>>())
+        .map(|b| b.lines().collect::<Vec<_>>().iter().map(|v| serde_json::from_str(v).expect("issue with serde_json")).collect::<Vec<_>>())
         .collect::<Vec<_>>();
 
     let mut checks = Vec::new();
@@ -90,23 +83,26 @@ fn main() -> Result<()> {
 
     println!("Part 2");
 
-    let new_input = input + "array(array(2))\narray(array(6))";
+    let new_input = input + "[[2]]\n[[6]]";
 
     let mut message = new_input
         .lines()
         .filter(|l| !l.is_empty())
-        .map(|l| eval(l).expect("issue with eval"))
+        .map(|l| serde_json::from_str(l).expect("issue with serde_json"))
         .collect::<Vec<_>>();
 
 
     sort_packets(&mut message);
     message.reverse();
 
+    let first_divisor: Value = serde_json::from_str("[[2]]").expect("issue with serde_json");
+    let second_divisor: Value = serde_json::from_str("[[6]]").expect("issue with serde_json");
+
     let indices = message
         .iter()
         .enumerate()
         .filter(|(_, v)| {
-            *v == &eval("array(array(2))").unwrap() || *v == &eval("array(array(6))").unwrap()
+            *v == &first_divisor || *v == &second_divisor
         })
         .map(|(i, _)| {
             i + 1
